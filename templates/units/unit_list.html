@@ -31,4 +31,17 @@
     </div>
   </section>
 {% endif %}
+<section class="team-statistics">
+  <div class="section-heading"><div><p class="eyebrow">FORTRESS INTELLIGENCE</p><h2>Combat statistics</h2></div><span class="stats-caption">AGGREGATED FROM SAVED FIGHT HISTORIES</span></div>
+  <div class="team-stats-grid">
+    {% for stats in team_statistics %}
+      <article class="panel team-stat-card team-{{ stats.team|lower }}">
+        <div class="team-stat-heading"><span class="team-dot"></span><h3>{{ stats.team }} team</h3></div>
+        <div class="team-stat-primary"><strong>{{ stats.fights }}</strong><span>FIGHTS</span></div>
+        <div class="team-stat-details"><div><span>DAMAGE CAUSED</span><strong>{{ stats.damage_caused }}</strong></div><div><span>DAMAGE TAKEN</span><strong>{{ stats.damage_taken }}</strong></div></div>
+      </article>
+    {% endfor %}
+  </div>
+  <p class="stats-note">Damage totals add the attack points recorded on every fight turn.</p>
+</section>
 {% endblock %}

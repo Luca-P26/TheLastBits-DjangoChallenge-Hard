@@ -9,4 +9,25 @@
   <div class="detail-image-link"><span>PROFILE IMAGE</span><a href="{{ unit.profile_image_link }}" target="_blank" rel="noopener noreferrer">{{ unit.profile_image_link }}</a></div>
   <div class="detail-actions"><a class="button secondary" href="{% url 'unit-list' %}">Back to roster</a>{% if unit.health < 100 %}<form method="post" action="{% url 'unit-heal' unit.pk %}">{% csrf_token %}<button class="button primary" type="submit">Heal fighter</button></form>{% endif %}</div>
 </section>
+<section class="unit-fights">
+  <div class="section-heading"><div><p class="eyebrow">PERSONAL COMBAT RECORD</p><h2>Fight history</h2></div><span class="fight-total">{{ fights|length }} FIGHT{{ fights|length|pluralize|upper }}</span></div>
+  {% if fights %}
+    <div class="unit-fight-list">
+      {% for fight in fights %}
+        <article class="panel unit-fight-card">
+          <div class="unit-fight-heading">
+            <div><span class="fight-date">FIGHT #{{ fight.pk }} · {{ fight.created_at|date:'M j, Y · H:i' }}</span><h3>{% if fight.unit_one == unit %}{{ fight.unit_two.name }}{% else %}{{ fight.unit_one.name }}{% endif %} <i>vs</i> {{ unit.name }}</h3></div>
+            <strong class="fight-winner">{% if fight.winner %}Winner: {{ fight.winner.name }}{% else %}Stalemate{% endif %}</strong>
+          </div>
+          <ol class="unit-turn-list">
+            {% for turn in fight.turns.all %}
+              <li><span class="turn-number">{{ turn.turn_number|stringformat:'02d' }}</span><span class="unit-turn-text"><b>{{ turn.attacker.name }}</b> hit <b>{{ turn.defender.name }}</b> for {{ turn.attack_points }} damage <small>· {{ turn.attacker.name }} {{ turn.attacker_health }} HP / {{ turn.defender.name }} {{ turn.defender_health }} HP</small></span></li>
+            {% empty %}<li class="no-turns">No attacks were recorded.</li>{% endfor %}
+          </ol>
+          <a class="fight-detail-link" href="{% url 'fight-result' fight.pk %}">Open full combat log →</a>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}<div class="panel empty-state fight-empty"><p>This fighter has no recorded fights yet.</p></div>{% endif %}
+</section>
 {% endblock %}

@@ -2,6 +2,7 @@ import random
 
 from django.contrib import messages
 from django.db import transaction
+from django.db.models import Count, Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import FightForm, UnitForm
@@ -24,12 +25,43 @@ def create_unit(request):
 def unit_list(request):
     units = Unit.objects.all()
     recent_fights = Fight.objects.select_related('unit_one', 'unit_two', 'winner')[:5]
-    return render(request, 'units/unit_list.html', {'units': units, 'recent_fights': recent_fights})
+    fight_counts = Fight.objects.aggregate(
+        blue=Count('id', filter=Q(unit_one__team=Unit.Team.BLUE) | Q(unit_two__team=Unit.Team.BLUE)),
+        red=Count('id', filter=Q(unit_one__team=Unit.Team.RED) | Q(unit_two__team=Unit.Team.RED)),
+    )
+    damage_totals = FightTurn.objects.aggregate(
+        blue_caused=Sum('attack_points', filter=Q(attacker__team=Unit.Team.BLUE)),
+        blue_taken=Sum('attack_points', filter=Q(defender__team=Unit.Team.BLUE)),
+        red_caused=Sum('attack_points', filter=Q(attacker__team=Unit.Team.RED)),
+        red_taken=Sum('attack_points', filter=Q(defender__team=Unit.Team.RED)),
+    )
+    team_statistics = [
+        {
+            'team': 'Blue',
+            'fights': fight_counts['blue'],
+            'damage_caused': damage_totals['blue_caused'] or 0,
+            'damage_taken': damage_totals['blue_taken'] or 0,
+        },
+        {
+            'team': 'Red',
+            'fights': fight_counts['red'],
+            'damage_caused': damage_totals['red_caused'] or 0,
+            'damage_taken': damage_totals['red_taken'] or 0,
+        },
+    ]
+    return render(request, 'units/unit_list.html', {
+        'units': units,
+        'recent_fights': recent_fights,
+        'team_statistics': team_statistics,
+    })
 
 
 def unit_detail(request, pk):
     unit = get_object_or_404(Unit, pk=pk)
-    return render(request, 'units/unit_detail.html', {'unit': unit})
+    fights = Fight.objects.filter(Q(unit_one=unit) | Q(unit_two=unit)).select_related(
+        'unit_one', 'unit_two', 'winner'
+    ).prefetch_related('turns__attacker', 'turns__defender')
+    return render(request, 'units/unit_detail.html', {'unit': unit, 'fights': fights})
 
 
 def heal_unit(request, pk):
