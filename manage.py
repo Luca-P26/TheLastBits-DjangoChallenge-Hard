@@ -6,6 +6,9 @@ import sys
 
 def main():
     """Run administrative tasks."""
+
+    print("Hello, World!")
+
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'coderrun_prob3.settings')
     try:
         from django.core.management import execute_from_command_line
