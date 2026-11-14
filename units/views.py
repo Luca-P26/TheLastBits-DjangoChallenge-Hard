@@ -7,6 +7,38 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import FightForm, UnitForm
 from .models import Fight, FightTurn, Unit
+from .models import ImportedFight, ImportedFightEvent, Person
+
+
+def register_challenge_roster(request):
+    if request.method != 'POST':
+        return redirect('simulate-challenge')
+    from .tasks import register_people
+
+    register_people.delay()
+    messages.success(request, 'Roster registration has started in the background.')
+    return redirect('simulate-challenge')
+
+
+def simulate_challenge(request):
+    # The page is also the challenge's live status board. Any pending imported
+    # fights are dispatched independently and the task safely claims each once.
+    pending_count = ImportedFight.objects.filter(status=ImportedFight.Status.PENDING).count()
+    if pending_count:
+        from .tasks import dispatch_pending_fights
+
+        dispatch_pending_fights.delay()
+    fights = ImportedFight.objects.select_related('blue_soldier', 'red_soldier').prefetch_related(
+        'events__attacker', 'events__defender'
+    )
+    return render(request, 'units/simulate.html', {
+        'people_count': Person.objects.count(),
+        'drafted_count': Person.objects.exclude(rank='').count(),
+        'fights': fights,
+        'event_count': ImportedFightEvent.objects.count(),
+        'pending_count': pending_count,
+        'running_count': ImportedFight.objects.filter(status=ImportedFight.Status.RUNNING).count(),
+    })
 
 
 def create_unit(request):

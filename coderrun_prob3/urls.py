@@ -21,6 +21,9 @@ from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('simulate', unit_views.simulate_challenge, name='simulate-challenge-no-slash'),
+    path('simulate/', unit_views.simulate_challenge, name='simulate-challenge'),
+    path('register-people/', unit_views.register_challenge_roster, name='register-challenge-roster'),
     path('unit', unit_views.create_unit, name='unit-create'),
     path('unit/', unit_views.create_unit, name='unit-create-slash'),
     path('unit/', include('units.urls')),

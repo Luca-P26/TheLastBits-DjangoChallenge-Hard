@@ -1,0 +1,31 @@
+{% extends 'units/base.html' %}
+{% block title %}Challenge simulation · Deadlock's Army{% endblock %}
+{% block content %}
+<section class="roster-heading">
+  <div><p class="eyebrow">CHALLENGE CONTROL / BACKGROUND WORKERS</p><h1>Draft &amp; simulate</h1><p>Roster ingestion, drafting batches, and fight replays run in the background.</p></div>
+  {% if not people_count %}<form method="post" action="{% url 'register-challenge-roster' %}">{% csrf_token %}<button class="button primary" type="submit">Register people</button></form>{% endif %}
+</section>
+<section class="team-statistics">
+  <div class="team-stats-grid">
+    <article class="panel team-stat-card"><h3>People registered</h3><div class="team-stat-primary"><strong>{{ people_count }}</strong></div></article>
+    <article class="panel team-stat-card"><h3>People drafted</h3><div class="team-stat-primary"><strong>{{ drafted_count }}</strong></div></article>
+    <article class="panel team-stat-card"><h3>Fights stored</h3><div class="team-stat-primary"><strong>{{ fights|length }}</strong></div></article>
+    <article class="panel team-stat-card"><h3>Fight events</h3><div class="team-stat-primary"><strong>{{ event_count }}</strong></div></article>
+  </div>
+  <p class="stats-note">{{ pending_count }} pending · {{ running_count }} running · reload this page to refresh the live results.</p>
+</section>
+{% if fights %}
+<section class="recent-fights">
+  <div class="section-heading"><div><p class="eyebrow">BATTLE RECORD</p><h2>Challenge fights</h2></div></div>
+  <div class="recent-fight-list">
+    {% for fight in fights %}
+      <article class="recent-fight" style="display:block">
+        <span><strong>#{{ fight.id }}</strong> · {{ fight.blue_soldier.name }} (Blue) <i>vs</i> {{ fight.red_soldier.name }} (Red)</span>
+        <strong>{{ fight.get_status_display }}</strong>
+        <ol>{% for event in fight.events.all %}<li>Turn {{ event.turn_number }}: {{ event.attacker.name }} hit {{ event.defender.name }} for {{ event.damage }}{% if event.defender_health_after != None %} damage ({{ event.defender_health_after }} HP left){% endif %}</li>{% endfor %}</ol>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+{% else %}<section class="panel empty-state"><h2>No challenge fights yet</h2><p>Register the peacetime roster to start the import and drafting pipeline.</p></section>{% endif %}
+{% endblock %}

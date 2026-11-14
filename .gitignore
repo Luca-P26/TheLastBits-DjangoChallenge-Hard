@@ -1,0 +1,2 @@
+celery-broker.sqlite3
+work/celery-worker*.log
