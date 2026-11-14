@@ -1,7 +1,7 @@
 {% extends 'units/base.html' %}
 {% block title %}Army Roster · Deadlock's Army{% endblock %}
 {% block content %}
-<section class="roster-heading"><div><p class="eyebrow">FORTRESS DEFENSE / LIVE ROSTER</p><h1>Army roster</h1><p>Every fighter ready to defend the fortress.</p></div><a class="button primary" href="{% url 'unit-create' %}">+ Enlist fighter</a></section>
+<section class="roster-heading"><div><p class="eyebrow">FORTRESS DEFENSE / LIVE ROSTER</p><h1>Army roster</h1><p>Every fighter ready to defend the fortress.</p></div><div class="roster-actions"><a class="button secondary" href="{% url 'fight-simulate' %}">⚔ Simulate fight</a><a class="button primary" href="{% url 'unit-create' %}">+ Enlist fighter</a></div></section>
 <div class="roster-meta"><span>{{ units|length }} FIGHTER{{ units|length|pluralize|upper }} DEPLOYED</span><span>BLUE &nbsp;·&nbsp; RED</span></div>
 {% if units %}
   <section class="roster-grid">
@@ -20,5 +20,15 @@
   </section>
 {% else %}
   <section class="panel empty-state"><div class="empty-icon">✦</div><h2>The roster is empty</h2><p>Enlist the first fighter to begin the defense.</p><a class="button primary" href="{% url 'unit-create' %}">Enlist first fighter <span>→</span></a></section>
+{% endif %}
+{% if recent_fights %}
+  <section class="recent-fights">
+    <div class="section-heading"><div><p class="eyebrow">COMBAT LOG</p><h2>Recent fights</h2></div><a href="{% url 'fight-simulate' %}">Simulate another →</a></div>
+    <div class="recent-fight-list">
+      {% for fight in recent_fights %}
+        <a class="recent-fight" href="{% url 'fight-result' fight.pk %}"><span>{{ fight.unit_one.name }} <i>vs</i> {{ fight.unit_two.name }}</span><strong>{% if fight.winner %}{{ fight.winner.name }} won{% else %}Stalemate{% endif %}</strong><small>{{ fight.created_at|date:'M j, Y · H:i' }}</small></a>
+      {% endfor %}
+    </div>
+  </section>
 {% endif %}
 {% endblock %}

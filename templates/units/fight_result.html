@@ -1,0 +1,21 @@
+{% extends 'units/base.html' %}
+{% block title %}Combat Log · Deadlock's Army{% endblock %}
+{% block content %}
+<p class="eyebrow"><a href="{% url 'unit-list' %}">← ARMY ROSTER</a> &nbsp; / &nbsp; COMBAT LOG #{{ fight.pk }}</p>
+<section class="panel fight-summary">
+  <div class="fight-matchup"><div><span class="team-badge team-{{ fight.unit_one.team|lower }}">{{ fight.unit_one.team }} TEAM</span><h1>{{ fight.unit_one.name }}</h1><p>{{ fight.unit_one.type }} · {{ fight.unit_one.health }} HP remaining</p></div><span class="versus">VS</span><div><span class="team-badge team-{{ fight.unit_two.team|lower }}">{{ fight.unit_two.team }} TEAM</span><h1>{{ fight.unit_two.name }}</h1><p>{{ fight.unit_two.type }} · {{ fight.unit_two.health }} HP remaining</p></div></div>
+  <div class="fight-outcome">{% if fight.winner %}<span class="eyebrow">VICTORY</span><strong>{{ fight.winner.name }}</strong>{% else %}<span class="eyebrow">RESULT</span><strong>Stalemate</strong><small>Both fighters have zero attack points; no attacks could be made.</small>{% endif %}</div>
+  <p class="turn-count">{{ fight.turns.count }} ATTACK{{ fight.turns.count|pluralize|upper }} RECORDED · {{ fight.created_at|date:'M j, Y · H:i' }}</p>
+</section>
+<section class="combat-log">
+  <div class="section-heading"><div><p class="eyebrow">SAVED STEP BY STEP</p><h2>Fight history</h2></div><a href="{% url 'fight-simulate' %}">New fight →</a></div>
+  {% if fight.turns.all %}
+    <div class="turn-list">
+      {% for turn in fight.turns.all %}
+        <article class="turn-row"><span class="turn-number">{{ turn.turn_number|stringformat:'02d' }}</span><div class="turn-main"><strong>{{ turn.attacker.name }} <span>attacked</span> {{ turn.defender.name }}</strong><small>{{ turn.attacker.name }}: {{ turn.attacker_health }} HP &nbsp;·&nbsp; {{ turn.defender.name }}: {{ turn.defender_health }} HP</small></div><b class="damage">−{{ turn.attack_points }} HP</b></article>
+      {% endfor %}
+    </div>
+  {% else %}<div class="panel empty-state"><p>No attacks occurred.</p></div>{% endif %}
+</section>
+<a class="button secondary back-button" href="{% url 'unit-list' %}">Back to roster</a>
+{% endblock %}

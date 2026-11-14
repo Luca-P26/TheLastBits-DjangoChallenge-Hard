@@ -1,0 +1,16 @@
+{% extends 'units/base.html' %}
+{% block title %}Simulate a Fight · Deadlock's Army{% endblock %}
+{% block content %}
+<section class="intro"><p class="eyebrow">COMBAT SIMULATOR / LIVE FIRE</p><h1>Set the fighters</h1><p>Choose one living fighter from each team. They will alternate attacks until one falls.</p></section>
+<form class="panel form-panel fight-panel" method="post">
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+  <div class="fight-selectors">
+    <div class="field"><label for="{{ form.fighter_one.id_for_label }}">{{ form.fighter_one.label }} <span class="required">*</span></label>{{ form.fighter_one }}{% for error in form.fighter_one.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</div>
+    <div class="versus">VS</div>
+    <div class="field"><label for="{{ form.fighter_two.id_for_label }}">{{ form.fighter_two.label }} <span class="required">*</span></label>{{ form.fighter_two }}{% for error in form.fighter_two.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</div>
+  </div>
+  <p class="help">Only living fighters are available. The form rejects fighters from the same team.</p>
+  <div class="form-footer"><a class="button secondary" href="{% url 'unit-list' %}">Back to roster</a><button class="button primary" type="submit">Simulate fight <span>⚔</span></button></div>
+</form>
+{% endblock %}
