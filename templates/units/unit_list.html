@@ -1,0 +1,24 @@
+{% extends 'units/base.html' %}
+{% block title %}Army Roster · Deadlock's Army{% endblock %}
+{% block content %}
+<section class="roster-heading"><div><p class="eyebrow">FORTRESS DEFENSE / LIVE ROSTER</p><h1>Army roster</h1><p>Every fighter ready to defend the fortress.</p></div><a class="button primary" href="{% url 'unit-create' %}">+ Enlist fighter</a></section>
+<div class="roster-meta"><span>{{ units|length }} FIGHTER{{ units|length|pluralize|upper }} DEPLOYED</span><span>BLUE &nbsp;·&nbsp; RED</span></div>
+{% if units %}
+  <section class="roster-grid">
+    {% for unit in units %}
+      <article class="fighter-card team-{{ unit.team|lower }}">
+        <a class="fighter-main" href="{% url 'unit-detail' unit.pk %}">
+          <img class="avatar" src="{{ unit.profile_image_link }}" alt="Portrait of {{ unit.name }}" width="50" height="50" loading="lazy" onerror="this.style.display='none'">
+          <span class="fighter-copy"><strong>{{ unit.name }}</strong><span>{{ unit.type }} <i>·</i> {{ unit.team }} team</span></span>
+          <span class="card-arrow">↗</span>
+        </a>
+        <div class="card-stats"><span>HEALTH <b>{{ unit.health }}<small>/100</small></b></span><span>ATTACK <b>{{ unit.attack_points }}<small>/50</small></b></span></div>
+        <div class="health-track"><span style="width: {{ unit.health }}%"></span></div>
+        {% if unit.health < 100 %}<form method="post" action="{% url 'unit-heal' unit.pk %}" class="heal-form">{% csrf_token %}<button class="heal-button" type="submit">Heal to full <span>+</span></button></form>{% endif %}
+      </article>
+    {% endfor %}
+  </section>
+{% else %}
+  <section class="panel empty-state"><div class="empty-icon">✦</div><h2>The roster is empty</h2><p>Enlist the first fighter to begin the defense.</p><a class="button primary" href="{% url 'unit-create' %}">Enlist first fighter <span>→</span></a></section>
+{% endif %}
+{% endblock %}

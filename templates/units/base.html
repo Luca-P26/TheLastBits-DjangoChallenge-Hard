@@ -1,0 +1,21 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Deadlock's Army{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'units/style.css' %}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{% url 'unit-list' %}"><span class="brand-mark">D</span><span>DEADLOCK <small>FORTRESS COMMAND</small></span></a>
+    <nav><a href="{% url 'unit-list' %}">Army roster</a><a class="nav-add" href="{% url 'unit-create' %}">+ Enlist fighter</a></nav>
+  </header>
+  <main class="page-shell">
+    {% if messages %}<div class="messages">{% for message in messages %}<div class="message {{ message.tags }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer>FORTRESS COMMAND <span>·</span> HOLD THE LINE</footer>
+</body>
+</html>

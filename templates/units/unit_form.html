@@ -1,0 +1,20 @@
+{% extends 'units/base.html' %}
+{% block title %}Enlist a Fighter · Deadlock's Army{% endblock %}
+{% block content %}
+<section class="intro"><p class="eyebrow">RECRUITMENT OFFICE / 01</p><h1>Enlist a fighter</h1><p>Bring a new warrior into the ranks. Set their battlefield profile below.</p></section>
+<form class="panel form-panel" method="post" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+  <div class="form-grid">
+    {% for field in form %}
+      <div class="field {% if field.name == 'profile_image_link' %}wide{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="required">*</span>{% endif %}</label>
+        {{ field }}
+        {% if field.help_text %}<small class="help">{{ field.help_text }}</small>{% endif %}
+        {% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+  <div class="form-footer"><span class="help">Health: 0–100 · Attack points: 0–50</span><button class="button primary" type="submit">Add fighter <span>→</span></button></div>
+</form>
+{% endblock %}

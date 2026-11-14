@@ -1,0 +1,12 @@
+{% extends 'units/base.html' %}
+{% block title %}{{ unit.name }} · Deadlock's Army{% endblock %}
+{% block content %}
+<p class="eyebrow"><a href="{% url 'unit-list' %}">← ARMY ROSTER</a> &nbsp; / &nbsp; FIGHTER DOSSIER</p>
+<section class="panel detail-panel team-{{ unit.team|lower }}">
+  <img class="detail-avatar" src="{{ unit.profile_image_link }}" alt="Portrait of {{ unit.name }}" onerror="this.style.display='none'">
+  <div class="detail-heading"><span class="team-badge">{{ unit.team }} TEAM</span><h1>{{ unit.name }}</h1><p>{{ unit.type }} · Unit #{{ unit.pk }}</p></div>
+  <div class="detail-stats"><div><span>HEALTH</span><strong>{{ unit.health }}<small> / 100</small></strong><div class="health-track"><span style="width: {{ unit.health }}%"></span></div></div><div><span>ATTACK POINTS</span><strong>{{ unit.attack_points }}<small> / 50</small></strong></div></div>
+  <div class="detail-image-link"><span>PROFILE IMAGE</span><a href="{{ unit.profile_image_link }}" target="_blank" rel="noopener noreferrer">{{ unit.profile_image_link }}</a></div>
+  <div class="detail-actions"><a class="button secondary" href="{% url 'unit-list' %}">Back to roster</a>{% if unit.health < 100 %}<form method="post" action="{% url 'unit-heal' unit.pk %}">{% csrf_token %}<button class="button primary" type="submit">Heal fighter</button></form>{% endif %}</div>
+</section>
+{% endblock %}
