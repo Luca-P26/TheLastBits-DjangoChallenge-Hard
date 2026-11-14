@@ -17,10 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from units import views as unit_views
+from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('unit', unit_views.create_unit, name='unit-create'),
     path('unit/', unit_views.create_unit, name='unit-create-slash'),
     path('unit/', include('units.urls')),
+    path('', RedirectView.as_view(url='/unit/', permanent=False)),
+
 ]
